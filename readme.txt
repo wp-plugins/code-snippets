@@ -22,10 +22,9 @@ Code Snippets includes an option to clean up its data when deactivated. Each scr
 
 Further information and screenshots are available on the plugin homepage at http://bungeshea.wordpress.com/plugins/code-snippets.
 
-Code Snippets was featured on WPMU!
-http://wpmu.org/wordpress-code-snippets
+[Code Snippets was featured on WPMU!](http://wpmu.org/wordpress-code-snippets/)
 
-If you have any feedback, issues or suggestions for improvements please leave start a topic in the [Support Forum]{http://wordpress.org/support/plugin/code-snippets) and if you like the plugin please give it a rating at http://wordpress.org/extend/plugins/code-snippets :-)
+If you have any feedback, issues or suggestions for improvements please leave start a topic in the [Support Forum](http://wordpress.org/support/plugin/code-snippets) and if you like the plugin please give it a rating at [WordPress.org](http://wordpress.org/extend/plugins/code-snippets) :-)
 
 == Installation ==
 
