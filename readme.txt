@@ -20,7 +20,7 @@ Snippets are stored in the `wp_snippets` table in the WordPress database (the ta
 
 Code Snippets includes an option to clean up its data when deactivated. Each screen includes a help tab just in case you get stuck.
 
-Further information and screenshots are available on the plugin homepage at http://bungeshea.wordpress.com/plugins/code-snippets.
+Further information and screenshots are available on the [plugin homepage]( http://bungeshea.wordpress.com/plugins/code-snippets).
 
 [Code Snippets was featured on WPMU!](http://wpmu.org/wordpress-code-snippets/)
 
@@ -29,10 +29,10 @@ If you have any feedback, issues or suggestions for improvements please leave st
 == Installation ==
 
 1. Download the `code-snippets.zip` file to your local machine.
-2. Either use the automatic plugin installer **(Plugins - Add New)** or Unzip the file and upload the **code-snippets** folder to your `/wp-content/plugins/` directory.
+2. Either use the automatic plugin installer *(Plugins > Add New)* or Unzip the file and upload the **code-snippets** folder to your `/wp-content/plugins/` directory.
 3. Activate the plugin through the Plugins menu
-4. Visit the **Add New Snippet** menu page **(Snippets > Add New)** to add or edit Snippets.
-5. Activate your snippets through the Manage Snippets page **(Snippets > Manage Snippets)**
+4. Visit the Add New Snippet menu page *(Snippets > Add New)* to add or edit Snippets.
+5. Activate your snippets through the Manage Snippets page *(Snippets > Manage Snippets)*
 
 == Frequently Asked Questions ==
 
