@@ -20,7 +20,7 @@ Snippets are stored in the `wp_snippets` table in the WordPress database (the ta
 
 Code Snippets includes an option to clean up its data when deactivated. Each screen includes a help tab just in case you get stuck.
 
-Further information and screenshots are available on the plugin homepage at http://bungeshea.wordpress.com/plugins/code-snippets.
+Further information and screenshots are available on the [plugin homepage]( http://bungeshea.wordpress.com/plugins/code-snippets).
 
 [Code Snippets was featured on WPMU!](http://wpmu.org/wordpress-code-snippets/)
 
