@@ -29,10 +29,10 @@ If you have any feedback, issues or suggestions for improvements please leave st
 == Installation ==
 
 1. Download the `code-snippets.zip` file to your local machine.
-2. Either use the automatic plugin installer **(Plugins - Add New)** or Unzip the file and upload the **code-snippets** folder to your `/wp-content/plugins/` directory.
+2. Either use the automatic plugin installer *(Plugins > Add New)* or Unzip the file and upload the **code-snippets** folder to your `/wp-content/plugins/` directory.
 3. Activate the plugin through the Plugins menu
-4. Visit the **Add New Snippet** menu page **(Snippets > Add New)** to add or edit Snippets.
-5. Activate your snippets through the Manage Snippets page **(Snippets > Manage Snippets)**
+4. Visit the Add New Snippet menu page *(Snippets > Add New)* to add or edit Snippets.
+5. Activate your snippets through the Manage Snippets page *(Snippets > Manage Snippets)*
 
 == Frequently Asked Questions ==
 
