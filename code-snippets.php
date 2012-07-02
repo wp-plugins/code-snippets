@@ -1,5 +1,32 @@
 <?php
 
+<<<<<<< .mine
+/**
+ * Plugin Name:	Code Snippets
+ * Plugin URI: http://wordpress.org/extend/plugins/code-snippets
+ * Description:	Provides an easy-to-manage GUI interface for adding code snippets to your blog.
+ * Author: Shea Bunge
+ * Version: 1.0
+ * Author URI: http://bungeshea.wordpress.com/plugins/code-snippets/
+ * License: GPLv3 or later
+ *  
+ * Code Snippets - WordPress Plugin
+ * Copyright (C) 2012  Shea Bunge
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+=======
 /*
 	Plugin Name:	Code Snippets
 	Plugin URI:		http://wordpress.org/extend/plugins/code-snippets
@@ -11,20 +38,7 @@
 	
 	Code Snippets - WordPress Plugin
     Copyright (C) 2012  Shea Bunge
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+>>>>>>> .r566377
 
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
