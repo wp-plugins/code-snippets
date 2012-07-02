@@ -3,7 +3,7 @@ Contributors: bungeshea
 Donate link: http://bungeshea.wordpress.com/donate/
 Tags: snippets, code, php
 Requires at least: 3.3
-Tested up to: 3.4
+Tested up to: 3.4.1
 Stable tag: 1.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl.html
@@ -29,7 +29,7 @@ If you have any feedback, issues or suggestions for improvements please leave st
 1. Download the `code-snippets.zip` file to your local machine.
 2. Either use the automatic plugin installer *(Plugins - Add New)* or Unzip the file and upload the **code-snippets** folder to your `/wp-content/plugins/` directory.
 3. Activate the plugin through the Plugins menu
-4. Visit the **Add New Snippet** menu page **(Snippets > Add New)** to add or edit Snippets.
+4. Visit the Add New Snippet menu page **(Snippets > Add New)** to add or edit Snippets.
 5. Activate your snippets through the Manage Snippets page **(Snippets > Manage Snippets)**
 
 == Frequently Asked Questions ==
