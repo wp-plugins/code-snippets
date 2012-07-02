@@ -3,7 +3,7 @@ Contributors: bungeshea
 Donate link: http://bungeshea.wordpress.com/donate/
 Tags: snippets, code, php
 Requires at least: 3.3
-Tested up to: 3.4
+Tested up to: 3.4.1
 Stable tag: 1.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl.html
