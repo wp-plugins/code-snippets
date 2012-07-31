@@ -24,7 +24,7 @@ Further information and screenshots are available on the [plugin homepage](http:
 
 Code Snippets was featured on WPMU: [WordPress Code Snippets: Keep them Organized with this Plugin!](http://wpmu.org/wordpress-code-snippets)
 
-If you have any feedback, issues or suggestions for improvements please leave start a topic in the [Support Forum]{http://wordpress.org/support/plugin/code-snippets) and if you like the plugin please give it a perfect rating at [WordPress.org](http://wordpress.org/extend/plugins/code-snippets) :-)
+If you have any feedback, issues or suggestions for improvements please leave start a topic in the [Support Forum](http://wordpress.org/support/plugin/code-snippets) and if you like the plugin please give it a perfect rating at [WordPress.org](http://wordpress.org/extend/plugins/code-snippets) :-)
 
 You can also contribute to the code at [GitHub](https://github.com/bungeshea/code-snippets).
 
