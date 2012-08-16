@@ -1,11 +1,11 @@
 <?php
 /*
 	Plugin Name:	Code Snippets
-	Plugin URI:		http://bungeshea.wordpress.com/plugins/code-snippets/
-	Description:	Provides an easy-to-manage GUI interface for adding code snippets to your blog.
+	Plugin URI:		http://cs.bungeshea.tk
+	Description:	An easy, clean and simple way to add code snippets to your site. No need to edit to your theme's functions.php file again!
 	Author:			Shea Bunge
-	Version:		1.3
-	Author URI:		http://bungeshea.wordpress.com/
+	Version:		1.3.1
+	Author URI:		http://bungeshea.tk
 	License:		GPLv3 or later
 	
 	Code Snippets - WordPress Plugin
@@ -26,14 +26,14 @@
 */
 
 // Exit if accessed directly
-if ( !defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-if( !class_exists('Code_Snippets') ) :
+if( ! class_exists('Code_Snippets') ) :
 
 class Code_Snippets {
 
 	public $table    = 'snippets';
-	public $version	 = '1.3';
+	public $version	 = '1.3.1';
 	
 	public $file;
 	public $plugin_dir;
@@ -260,7 +260,7 @@ class Code_Snippets {
 	function plugin_meta( $links, $file ) {
 		if ( $file == $this->basename ) {
 			return array_merge( $links, array(
-				'<a href="http://wordpress.org/support/plugin/code-snippets/" title="Visit the WordPress.org plugin page">' . __( 'About' ) . '</a>',
+				'<a href="http://wordpress.org/extend/plugins/code-snippets/" title="Visit the WordPress.org plugin page">' . __( 'About' ) . '</a>',
 				'<a href="http://wordpress.org/support/plugin/code-snippets/" title="Visit the support forums">' . __( 'Support' ) . '</a>'
 			) );
 		}
