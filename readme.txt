@@ -4,7 +4,7 @@ Donate link: http://cs.bungeshea.tk/donate/
 Tags: snippets, code, php, network, multisite
 Requires at least: 3.3
 Tested up to: 3.4.1
-Stable tag: 1.3
+Stable tag: 1.3.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl.html
 
