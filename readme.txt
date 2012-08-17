@@ -1,10 +1,10 @@
 === Code Snippets ===
 Contributors: bungeshea
 Donate link: http://cs.bungeshea.tk/donate/
-Tags: snippets, code, php, network, multisite
+Tags: snippets, code, php, plugins
 Requires at least: 3.3
 Tested up to: 3.4.1
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -69,6 +69,9 @@ That's great! Let me know by starting (or adding to) a topic in the [Support For
 
 == Changelog ==
 
+= 1.3.2 =
+* Fixed a bug with bersion 1.3.1
+
 = 1.3.1 =
 * Changed plugin website URI
 * Cleaned up some code
@@ -101,7 +104,7 @@ You can also contribute to the code at [GitHub](https://github.com/bungeshea/cod
 
 == Upgrade Notice ==
 
-= 1.3.1 =
+= 1.3.2 =
 Check out Code Snippet's new website: http://cs.bungeshea.tk
 
 = 1.3 =

@@ -4,7 +4,7 @@
 	Plugin URI:		http://cs.bungeshea.tk
 	Description:	An easy, clean and simple way to add code snippets to your site. No need to edit to your theme's functions.php file again!
 	Author:			Shea Bunge
-	Version:		1.3.1
+	Version:		1.3.2
 	Author URI:		http://bungeshea.tk
 	License:		GPLv3 or later
 	
@@ -33,12 +33,7 @@ if( ! class_exists('Code_Snippets') ) :
 class Code_Snippets {
 
 	public $table    = 'snippets';
-	public $version	 = '1.3.1';
-	
-	public $file;
-	public $plugin_dir;
-	public $plugin_url;
-	public $basename;
+	public $version	 = '1.3.2';
 
 	var $admin_manage_url = 'snippets';
 	var $admin_edit_url   = 'snippet';
@@ -136,7 +131,7 @@ class Code_Snippets {
 			if( $_GET['action'] == 'export' )
 				cs_export( $_GET['id'], $this->table );
 	
-		require_once $this->plugin_dir . 'includes/help/admin-manage-help.php';
+		include $this->plugin_dir . 'includes/help/admin-manage-help.php';
 	}
 	
 	function admin_edit_title( $title ) {
@@ -148,11 +143,11 @@ class Code_Snippets {
 		if( isset( $_GET['action'] ) && @$_GET['action'] == 'edit' )
 			add_filter( 'admin_title',  array( $this, 'admin_edit_title' ) );
 	
-	require_once $this->plugin_dir . 'includes/help/admin-edit-help.php';
+		include $this->plugin_dir . 'includes/help/admin-edit-help.php';
 	}
 	
 	function admin_import_loader() {
-		require_once $this->plugin_dir . 'includes/help/admin-import-help.php';
+		include $this->plugin_dir . 'includes/help/admin-import-help.php';
 	}
 	
 	function bulk_action( $action, $ids ) {
@@ -209,7 +204,7 @@ class Code_Snippets {
 			}
 		}
 
-    require_once $this->plugin_dir . 'includes/admin-manage.php';
+    require $this->plugin_dir . 'includes/admin/admin-manage.php';
 }
 
 	function admin_edit() {
@@ -236,7 +231,7 @@ class Code_Snippets {
 				$msg = 'Please provide a name for the snippet and the code.';
 			}
 		}
-		require_once $this->plugin_dir . 'includes/admin-edit.php';
+		require $this->plugin_dir . 'includes/admin/admin-edit.php';
 	}
 
 	function admin_import() {
@@ -249,7 +244,7 @@ class Code_Snippets {
 			
 			$msg =  'Imported ' . $xml->count() . ' snippets';
 		}
-		require_once( $this->plugin_dir . 'includes/admin-import.php');
+		require $this->plugin_dir . 'includes/admin/admin-import.php';
 	}	
 	
 	function settings_link( $links ) {
