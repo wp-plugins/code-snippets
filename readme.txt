@@ -70,7 +70,7 @@ That's great! Let me know by starting (or adding to) a topic in the [Support For
 == Changelog ==
 
 = 1.3.2 =
-* Fixed a bug with bersion 1.3.1
+* Fixed a bug with version 1.3.1
 
 = 1.3.1 =
 * Changed plugin website URI
