@@ -861,7 +861,7 @@ class Code_Snippets {
 		
 			if( 'activate' == $_GET['action'] ) {
 				$this->activate( $id, $this->is_network );
-				wp_redirect( add_query_arg( 'activate' ) );
+				wp_redirect( add_query_arg( 'activate', true ) );
 			}
 			elseif( 'deactivate' == $_GET['action'] ) {
 				$this->deactivate( $id );
