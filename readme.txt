@@ -1,6 +1,6 @@
 === Code Snippets ===
 Contributors: bungeshea
-Donate link: http://cs.bungeshea.tk/donate/
+Donate link: http://cs.bungeshea.com/donate/
 Tags: snippets, code, php, plugins
 Requires at least: 3.3
 Tested up to: 3.4.1
@@ -20,7 +20,7 @@ You can use a graphical interface similar to the Plugins menu to manage, activat
 
 Although Code Snippets is designed to be easy-to-use and its interface looks, feels and acts as if it was a native part of WordPress, each screen includes a help tab, just in case you get stuck.
 
-Further information and screenshots are available on the [plugin homepage](http://cs.bungeshea.tk).
+Further information and screenshots are available on the [plugin homepage](http://cs.bungeshea.com).
 
 As featured on the WPMU blog: [WordPress Code Snippets: Keep them Organized with this Plugin!](http://wpmu.org/wordpress-code-snippets)
 
@@ -95,7 +95,7 @@ That's great! Let me know by starting (or adding to) a topic in the [Support For
 
 == Other Notes ==
 
-Plugin updates will be posted on the [plugin's homepage](http://cs.bungeshea.tk) ([RSS](http://cs.bungehea.tk/feed/)).
+Plugin updates will be posted on the [plugin's homepage](http://cs.bungeshea.com) ([RSS](http://cs.bungehea.tk/feed/)).
 
 * Snippets are stored in the `wp_snippets` table in the WordPress database (the table name may differ depending on what your table prefix is set to).
 * Code Snippets will automatically clean up its data when deleted through the WordPress dashboard
@@ -105,7 +105,7 @@ You can also contribute to the code at [GitHub](https://github.com/bungeshea/cod
 == Upgrade Notice ==
 
 = 1.3.2 =
-Check out Code Snippet's new website: http://cs.bungeshea.tk
+Check out Code Snippet's new website: http://cs.bungeshea.com
 
 = 1.3 =
 Added import/export feature
