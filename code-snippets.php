@@ -1,11 +1,11 @@
 <?php
 /*
 	Plugin Name: Code Snippets
-	Plugin URI: http://cs.bungeshea.tk
+	Plugin URI: http://cs.bungeshea.com
 	Description: An easy, clean and simple way to add code snippets to your site.
 	No need to edit to your theme's functions.php file again!
 	Author: Shea Bunge
-	Author URI: http://bungeshea.tk
+	Author URI: http://bungeshea.com
 	Version: 1.5
 	License: GPLv3 or later
 	Network: true
@@ -871,7 +871,7 @@ class Code_Snippets {
 				__('Support', 'code-snippets')
 			),
 			sprintf( $format,
-				'http://cs.bungeshea.tk/donate/',
+				'http://cs.bungeshea.com/donate/',
 				__('Support this plugin\'s development', 'code-snippets'),
 				__('Donate', 'code-snippets')
 			)
