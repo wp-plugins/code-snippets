@@ -4,7 +4,7 @@ $screen->add_help_tab( array(
 	'id'		=> 'overview',
 	'title'		=> __('Overview', 'code-snippets'),
 	'content'	=>
-		__('<p>Snippets are similar to plugins - they both extend and expand the functionality of WordPress. Snippets are more light-weight, just a few lines of code, and do not put as much load on your server. Here you can load snippets from a Code Snippets (.xml) import file into the database with your existing snippets.</p>', 'code-snippets')
+		'<p>' . __('Snippets are similar to plugins - they both extend and expand the functionality of WordPress. Snippets are more light-weight, just a few lines of code, and do not put as much load on your server. Here you can load snippets from a Code Snippets (.xml) import file into the database with your existing snippets.', 'code-snippets') . '</p>'
 ) );
 	
 $screen->add_help_tab( array(
@@ -17,9 +17,9 @@ $screen->add_help_tab( array(
 	
 $screen->add_help_tab( array(
 	'id'		=> 'export',
-	'title'		=> __('Exporting' ),
+	'title'		=> __('Exporting'),
 	'content'	=>
-		sprintf( __('<p>You can save your snippets to a Code Snippets (.xml) export file using the <a href="%s">Manage Snippets</a> page.</p>', $this->admin_manage_url ) );
+		'<p>' . sprintf( __('You can save your snippets to a Code Snippets (.xml) export file using the <a href="%s">Manage Snippets</a> page.', 'code-snippets'), $this->admin_manage_url ) . '</p>'
 ) );
 
 $screen->set_help_sidebar(
@@ -28,5 +28,3 @@ $screen->set_help_sidebar(
 	'<p>' . __('<a href="http://wordpress.org/support/plugin/code-snippets" target="_blank">Support Forums</a>', 'code-snippets') . '</p>' .
 	'<p>' . __('<a href="http://cs.bungeshea.com" target="_blank">Project Website</a>', 'code-snippets') .  '</p>'
 );
-
-?>

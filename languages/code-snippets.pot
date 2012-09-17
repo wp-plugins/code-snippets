@@ -3,13 +3,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Code Snippets 1.5\n"
-"Report-Msgid-Bugs-To: http://wordpress.org/tag/code-snippets\n"
-"POT-Creation-Date: 2012-09-10 08:40:02+00:00\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/support/plugin/code-snippets\n"
+"POT-Creation-Date: 2012-09-10 08:39:10+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2012-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: Shea Bunge <bungeshea@users.sourceforge.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
 #: code-snippets.php:282 code-snippets.php:283 code-snippets.php:292
@@ -331,7 +331,7 @@ msgstr ""
 #: includes/help/import.php:29 includes/help/manage.php:30
 #: includes/help/single.php:46
 msgid ""
-"<a href=\"http://cs.bungeshea.tk\" target=\"_blank\">Project Website</a>"
+"<a href=\"http://cs.bungeshea.com\" target=\"_blank\">Project Website</a>"
 msgstr ""
 
 #: includes/help/manage.php:7
@@ -465,22 +465,22 @@ msgid ""
 "snippet becoming active on your site."
 msgstr ""
 
-#. Plugin Name of the plugin/theme
+#. Plugin Name of the plugin
 msgid "Code Snippets"
 msgstr ""
 
-#. Plugin URI of the plugin/theme
-msgid "http://cs.bungeshea.tk"
+#. Plugin URI of the plugin
+msgid "http://cs.bungeshea.com"
 msgstr ""
 
-#. Description of the plugin/theme
+#. Description of the plugin
 msgid "An easy, clean and simple way to add code snippets to your site."
 msgstr ""
 
-#. Author of the plugin/theme
+#. Author of the plugin
 msgid "Shea Bunge"
 msgstr ""
 
-#. Author URI of the plugin/theme
-msgid "http://bungeshea.tk"
+#. Author URI of the plugin
+msgid "http://bungeshea.com"
 msgstr ""
