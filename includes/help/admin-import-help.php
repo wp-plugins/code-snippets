@@ -25,7 +25,7 @@ $screen->set_help_sidebar(
 	"<p><strong>For more information:</strong></p>" .
 	"<p><a href='http://wordpress.org/extend/plugins/code-snippets' target='_blank'>WordPress Extend</a></p>" .
 	"<p><a href='http://wordpress.org/support/plugin/code-snippets' target='_blank'>Support Forums</a></p>" .
-	"<p><a href='http://cs.bungeshea.tk' target='_blank'>SheaPress</a></p>"
+	"<p><a href='http://cs.bungeshea.com' target='_blank'>SheaPress</a></p>"
 );
 
 ?>

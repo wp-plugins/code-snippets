@@ -1,10 +1,10 @@
 <?php
 /*
 	Plugin Name: Code Snippets
-	Plugin URI: http://cs.bungeshea.tk
+	Plugin URI: http://cs.bungeshea.com
 	Description: An easy, clean and simple way to add code snippets to your site. No need to edit to your theme's functions.php file again!
 	Author: Shea Bunge
-	Author URI: http://bungeshea.tk
+	Author URI: http://bungeshea.com
 	Version: 1.4
 	License: GPLv3 or later
 	Network: true
@@ -370,7 +370,7 @@ final class Code_Snippets {
 			return array_merge( $links, array(
 				'<a href="http://wordpress.org/extend/plugins/code-snippets/" title="Visit the WordPress.org plugin page">' . __( 'About' ) . '</a>',
 				'<a href="http://wordpress.org/support/plugin/code-snippets/" title="Visit the support forums">' . __( 'Support' ) . '</a>',
-				'<a href="http://cs.bungeshea.tk/donate/" title="Support this plugin\'s development">' . __( 'Donate' ) . '</a>'
+				'<a href="http://cs.bungeshea.com/donate/" title="Support this plugin\'s development">' . __( 'Donate' ) . '</a>'
 			) );
 		}
 		return $links;

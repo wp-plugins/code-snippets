@@ -15,7 +15,7 @@ if( $screen->is_network ) {
 <div class="wrap">
 	<div id="icon-snippets" class="icon32"><br /></div><h2>Snippets <a href="<?php echo $this->admin_single_url; ?>&action=new" class="add-new-h2">Add New</a></h2>
 	<?php if ( defined( 'CS_SAFE_MODE' ) ) if( CS_SAFE_MODE ) : ?>
-		<div class="error"><p><strong>Warning:</strong> Safe mode is active and snippets will not execute! Remove the <code>CS_SAFE_MODE</code> constant from wp-config.php to turn off safe mode. <a href="http://cs.bungeshea.tk/docs/safe-mode" target="_blank">More info&rarr;</a></p></div>
+		<div class="error"><p><strong>Warning:</strong> Safe mode is active and snippets will not execute! Remove the <code>CS_SAFE_MODE</code> constant from wp-config.php to turn off safe mode. <a href="http://cs.bungeshea.com/docs/safe-mode" target="_blank">More info&rarr;</a></p></div>
 	<?php endif; ?>
 	<?php if ( isset( $msg ) ) : ?>
 		<div id="message" class="updated fade"><p><?php echo $msg; ?></p></div>
