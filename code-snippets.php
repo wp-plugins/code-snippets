@@ -228,7 +228,7 @@ class Code_Snippets {
 			}
 			
 			// Add the custom capabilities that were introduced in version 1.5.
-			$this->add_roles();
+			$this->add_caps();
 		}
 		
 		if( $this->current_version < 1.2 ) {
