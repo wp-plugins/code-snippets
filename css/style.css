@@ -4,37 +4,42 @@
 
 /* Snippets > Manage Snippets */
 
-.inactive a:hover {
+.snippets .inactive a {
+	color: #557799;
+}
+
+.snippets .inactive a:hover,
+#all-snippets-table .snippets .inactive a:hover,
+#search-snippets-table .snippets .inactive a:hover {
 	color: #d54e21;
 }
 
-a.delete:hover {
-	color: #f00;
-	border-bottom-color: #f00;
-}
-
-a.delete {
+.snippets .delete a{
 	color: #21759b;
 }
 
-tr {
+#wpbody-content .snippets tr {
 	background-color: #fcfcfc;
 }
 
-.inactive,
-.inactive th,
-.inactive td {
+.snippets .inactive,
+.snippets .inactive th,
+.snippets .inactive td {
 	background-color: #f4f4f4;
 }
 
-.active,
-.active th,
-.active td {
+.snippets .active,
+.snippets .active th,
+.snippets .active td {
 	color: #000;
 }
 
-.inactive a {
-	color: #557799;
+#wpbody-content .snippets  .column-name {
+	white-space: nowrap; /* prevents wrapping of snippet title */
+}
+
+#wpbody-content .snippets .manage-column.column-id.sortable{
+	min-width: 44px;
 }
 
 /* Snippets > Add New */
