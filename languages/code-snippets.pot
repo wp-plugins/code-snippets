@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2012-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Shea Bunge <bungeshea@email.com>\n"
+"Last-Translator: Shea Bunge <bungeshea@users.sourceforge.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
 #: code-snippets.php:357 code-snippets.php:358 code-snippets.php:367
