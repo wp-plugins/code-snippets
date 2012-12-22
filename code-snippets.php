@@ -556,7 +556,7 @@ final class Code_Snippets {
 			apply_filters( 'code_snippets_manage_url', 'snippets' ),
 			__('Add New Snippet', 'code-snippets'),
 			__('Add New', 'code-snippets'),
-			'network_snippets',
+			'install_snippets',
 			apply_filters( 'code_snippets_single_url', 'snippet' ),
 			array( $this, 'display_admin_single' )
 		);
