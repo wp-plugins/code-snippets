@@ -1,10 +1,10 @@
 === Code Snippets ===
 Contributors: bungeshea
-Donate link: http://cs.bungeshea.com/donate/
+Donate link: http://code-snippets.bungeshea.com/donate/
 Tags: snippets, code, php, network, multisite
 Requires at least: 3.3
-Tested up to: 3.4.2
-Stable tag: 1.5
+Tested up to: 3.5
+Stable tag: 1.6
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl.html
 
@@ -14,17 +14,19 @@ An easy, clean and simple way to add code snippets to your site.
 
 **Code Snippets** is an easy, clean and simple way to add code snippets to your site. No need to edit to your theme's `functions.php` file again!
 
-A snippet is a small chunk of PHP code that you can use to extend the functionality of a WordPress-powered website; essentially a mini-plugin with a lot less load on your site. Most snippet-hosting sites tell you to add snippet code to your active theme's `functions.php` file, which can get rather long and messy after a while. Code Snippets changes that by providing a GUI interface for adding snippets and actually running them on your site as if they were in your theme's `functions.php` file.
+A snippet is a small chunk of PHP code that you can use to extend the functionality of a WordPress-powered website; essentially a mini-plugin with a *lot* less load on your site.
+Most snippet-hosting sites tell you to add snippet code to your active theme's `functions.php` file, which can get rather long and messy after a while. 
+Code Snippets changes that by providing a GUI interface for adding snippets and ***actually running them on your site** as if they were in your theme's `functions.php` file.
 
-You can use a graphical interface similar to the Plugins menu to manage, activate, deactivate, edit and delete your snippets. Easily organise your snippets by adding add a name and description using the visual editor. Code Snippets includes built-in syntax highlighting and other features to help you write your code. Snippets can be exported for transfer to another side, either in XML for later importing by the Code Snippets plugin, or in PHP for creating your own plugin or theme.
+You can use a graphical interface, similar to the Plugins menu, to manage, activate, deactivate, edit and delete your snippets. Easily organise your snippets by adding a name and description using the visual editor. Code Snippets includes built-in syntax highlighting and other features to help you write your code. Snippets can be exported for transfer to another side, either in XML for later importing by the Code Snippets plugin, or in PHP for creating your own plugin or theme.
 
 Although Code Snippets is designed to be easy-to-use and its interface looks, feels and acts as if it was a native part of WordPress, each screen includes a help tab, just in case you get stuck.
 
-Further information, documentation and updates are available on the [plugin homepage](http://cs.bungeshea.com).
+Further information, documentation and updates are available on the [plugin homepage](http://code-snippets.bungeshea.com).
 
 [As featured on the WPMU blog](http://wpmu.org/wordpress-code-snippets)
 
-If you have any feedback, issues or suggestions for improvements please leave a topic in the [Support Forum](http://wordpress.org/support/plugin/code-snippets) and if you like the plugin please give it a perfect rating at [WordPress.org](http://wordpress.org/extend/plugins/code-snippets)
+If you have any feedback, issues, or suggestions for improvements please leave a topic in the [Support Forum](http://wordpress.org/support/plugin/code-snippets). If you like the plugin, or it is useful to you in any way, please review it on [WordPress.org][review]
 
 == Installation ==
 
@@ -44,20 +46,31 @@ If you have any feedback, issues or suggestions for improvements please leave a 
 3. Upload the contents of the zip file to the `wp-content/plugins/` folder of your WordPress installation
 4. Activate the Code Snippets plugin from 'Plugins' page.
 
-'Network Activating' Code Snippets through the Network Dashboard will enable a special interface for running snippets across the entire network.
+**Network Activating** Code Snippets through the Network Dashboard will enable a special interface for running snippets across the entire network.
 
 == Frequently Asked Questions ==
 
-Further documentation available on the [plugin website](http://cs.bungeshea.com/docs/).
+Further documentation available on the [plugin website](http://code-snippets.bungeshea.com/docs/).
 
-= Do I need to include the `&lt;?php`, `&lt;?` or `?&gt;` tags in my snippet? =
+= Do I need to include the `<?php`, `<?` or `?>` tags in my snippet? =
 No, just copy all the content inside those tags.
 
 = Is there a way to add a snippet but not run it right away? =
 Yes. Just add it but do not activate it yet.
 
+= How can I insert my snippet into the post text editor? =
+Snippets that you add to this plugin are not ment to be inserted into the text editor. Instead, they are run on your site just as if they were added to your functions.php file.
+
 = What do I use to write my snippets? =
-The [CodeMirror](http://codemirror.net) source-code editor will add line numbers, syntax highlighting, search, tabulate and other cool features to the code editor.
+The [CodeMirror](http://codemirror.net) source-code editor will add line numbers, syntax highlighting, bracket matching, search, tabulate and other cool features to the code editor.
+
+= Can I preform search and replace commands in the code editor? =
+
+* __Ctrl-F / Cmd-F__ : Start searching
+* __Ctrl-G / Cmd-G__ : Find next
+* __Shift-Ctrl-G / Shift-Cmd-G__ : Find previous
+* __Shift-Ctrl-F / Cmd-Option-F__ : Replace
+* __Shift-Ctrl-R / Shift-Cmd-Option-F__ : Replace all
 
 = Will I lose my snippets if I change the theme or upgrade WordPress? =
 No, the snippets are added to the WordPress database so are independent of the theme and unaffected by WordPress upgrades.
@@ -69,16 +82,19 @@ Yes, when you delete Code Snippets using the 'Plugins' menu in WordPress it will
 Yes! You can individually export a single snippet using the link below the snippet name on the 'Manage Snippets' page or bulk export multiple snippets using the 'Bulk Actions' feature. Snippets can later be imported using the 'Import Snippets' page by uploading the export file.
 
 = Can I export my snippets to PHP for a site where I'm not using the Code Snippets plugin? =
-Yes. Click the checkboxes next to the snippets you want to export, and then choose 'Export to PHP' from the Bulk Actions menu and click Apply. The generated PHP file will contain the exported snippets' code, as well as their name and description in comments.
+Yes. Click the checkboxes next to the snippets you want to export, and then choose **Export to PHP** from the Bulk Actions menu and click Apply. The generated PHP file will contain the exported snippets' code, as well as their name and description in comments.
 
 = Can I run network-wide snippets on a multisite installation? =
-You can run snippets across an entire multisite network by 'Network Activating' Code Snippets through the Network Dashboard.
+You can run snippets across an entire multisite network by **Network Activating** Code Snippets through the Network Dashboard.
+
+= I need help with Code Snippets =
+You can get help with Code Snippets either on the [WordPress Support Forums][support] or on [GithHub][issues].
 
 = I have an idea for a cool feature for Code Snippets! =
-That's great! Let me know by starting (or adding to) a topic in the [Support Forums](http://wordpress.org/support/plugin/code-snippets/).
+That's great! Let me know by starting (or adding to) a topic in the [Support Forums][support] or open an issue on [GitHub][issues].
 
 = I want to contribute to and help develop the Code Snippets plugin! =
-That's fantastic! Join me on [GitHub](http://github.com/bungeshea/code-snippets), and also be sure to check out the [development page](http://cs.bungeshea.com/dev) on the [project website](http://cs.bungeshea.com).
+That's fantastic! Join me on [GitHub][github], and also be sure to check out the [development page](http://code-snippets.bungeshea.com/development/) on the [project website][homepage].
 
 == Screenshots ==
 
@@ -86,9 +102,23 @@ That's fantastic! Join me on [GitHub](http://github.com/bungeshea/code-snippets)
 2. Managing network-wide snippets
 3. Adding a new snippet
 4. Editing a snippet
-5. Importing snppets from an XML file
+5. Importing snippets from an XML file
 
 == Changelog ==
+
+= 1.6 =
+* Updated code editor to use CodeMirror 3
+* Improved compatibility with Clean Options plugin
+* Code improvements and optimization
+* Changed namespace from `cs` to `code_snippets`
+* Move css and js under assets
+* Organized CodeMirror scripts
+* Improved updating process
+* Current line of code editor is now highlighted
+* Highlight matches of selected text in code editor
+* Only create snippet tables when needed
+* Store multisite only options in site options table
+* Fixed compatibility bugs with WordPress 3.5
 
 = 1.5 =
 * Updated CodeMirror to version 2.33
@@ -137,7 +167,7 @@ That's fantastic! Join me on [GitHub](http://github.com/bungeshea/code-snippets)
 
 == Other Notes ==
 
-Plugin updates will be posted on the [plugin's homepage](http://cs.bungeshea.com) ([RSS](http://cs.bungehea.tk/feed/)).
+Plugin updates will be posted on the [plugin's homepage](http://code-snippets.bungeshea.com/) ([RSS](http://code-snippets.bungeshea.com/feed/)).
 
 * Snippets are stored in the `wp_snippets` table in the WordPress database (the table name may differ depending on what your table prefix is set to).
 * Code Snippets will automatically clean up its data when deleted through the WordPress dashboard.
@@ -146,6 +176,9 @@ You can also contribute to the code at [GitHub](https://github.com/bungeshea/cod
 
 == Upgrade Notice ==
 
+= 1.6 =
+Improvements and optimization with WordPress 3.5
+
 = 1.5 =
 Improvements on the 'Manage Snippets' page and localization
 
@@ -153,7 +186,7 @@ Improvements on the 'Manage Snippets' page and localization
 Better code highlighting and improved multisite support
 
 = 1.3.2 =
-Check out Code Snippet's new website: http://cs.bungeshea.com
+Code Snippets has a new website: http://code-snippets.bungeshea.com/
 
 = 1.3 =
 Added import/export feature
@@ -165,3 +198,9 @@ Plugin data will now be cleaned up when you delete the plugin.
 
 = 1.1 =
 Minor bug fixes and improvements on the the 'Edit Snippet' page
+
+  [support]: http://wordpress.org/support/plugin/code-snippets/
+  [github]: https://github.com/bungeshea/code-snippets
+  [homepage]: http://code-snippets.bungeshea.com
+  [issues]: https://github.com/bungeshea/code-snippets/issues
+  [review]: http://wordpress.org/support/view/plugin-reviews/code-snippets
