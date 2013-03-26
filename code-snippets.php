@@ -15,9 +15,8 @@
  * Description: An easy, clean and simple way to add code snippets to your site. No need to edit to your theme's functions.php file again!
  * Author: Shea Bunge
  * Author URI: http://bungeshea.com
- * Version: 1.6.1
- * License: GPLv3 or later
- * Network: true
+ * Version: 1.7
+ * License: MIT
  * Text Domain: code-snippets
  * Domain Path: /languages/
  *
@@ -58,36 +57,6 @@ if ( ! class_exists( 'Code_Snippets' ) ) :
 final class Code_Snippets {
 
 	/**
-	 * The base name for the snippets table in the database
-	 * This will later be prepended with the WordPress table prefix
-	 *
-	 * DO NOT EDIT THIS VARIABLE!
-	 * Instead, use the 'code_snippets_table' filter
-	 *
-	 * If you need to use the table name in your own code,
-	 * use the $code_snippets->get_table_name() function
-	 *
-	 * @since Code Snippets 1.0
-	 * @access public
-	 */
-	private $table = 'snippets';
-
-	/**
-	 * The base name for the network snippets table in the database
-	 * This will later be prepended with the WordPress base table prefix
-	 *
-	 * DO NOT EDIT THIS VARIABLE!
-	 * Instead, use the 'code_snippets_multisite_table' filter
-	 *
-	 * If you need to use the table name in your own code,
-	 * use the $code_snippets->get_table_name() function
-	 *
-	 * @since Code Snippets 1.4
-	 * @access private
-	 */
-	private $ms_table = 'ms_snippets';
-
-	/**
 	 * The version number for this release of the plugin.
 	 * This will later be used for upgrades and enqueueing files
 	 *
@@ -97,10 +66,10 @@ final class Code_Snippets {
 	 * @since Code Snippets 1.0
 	 * @access public
 	 */
-	public $version = 1.6;
+	public $version = 1.7;
 
 	/**
-	 * The base URLs for the admin pages
+	 * The full URLs to the admin pages
 	 *
 	 * @since Code Snippets 1.0
 	 * @access public
@@ -117,7 +86,24 @@ final class Code_Snippets {
 	public $admin_manage, $admin_single, $admin_import;
 
 	/**
+	 * Variables to hold plugin paths
+	 *
+	 * @since Code Snippets 1.0
+	 * @access public
+	 */
+	public $file, $basename, $plugin_dir, $plugin_url;
+
+	/**
+	 * Stores an instance of the list table class
+	 *
+	 * @since Code Snippets 1.5
+	 * @access public
+	 */
+	public $list_table;
+
+	/**
 	 * The constructor function for our class
+	 * Hooks our initialize function to the init action
 	 *
 	 * @since Code Snippets 1.0
 	 * @access private
@@ -125,9 +111,22 @@ final class Code_Snippets {
 	 * @return void
 	 */
 	function __construct() {
+		add_action( 'init', array( $this, 'init' ) );
+	}
+
+	/**
+	 * Call our loader functions
+	 *
+	 * @since Code Snippets 1.7
+	 * @access private
+	 *
+	 * @return void
+	 */
+	function init() {
 		$this->setup_vars();  // initialise the variables
 		$this->setup_hooks(); // register the action and filter hooks
 		$this->upgrade();     // check if we need to change some stuff
+		do_action( 'code_snippets_init' );
 	}
 
 	/**
@@ -142,9 +141,6 @@ final class Code_Snippets {
 		global $wpdb;
 		$this->file       = __FILE__;
 
-		$this->table      = apply_filters( 'code_snippets_table', $wpdb->prefix . $this->table );
-		$this->ms_table   = apply_filters( 'code_snippets_multisite_table', $wpdb->base_prefix . $this->ms_table );
-
 		$this->basename	  = plugin_basename( $this->file );
 		$this->plugin_dir = plugin_dir_path( $this->file );
 		$this->plugin_url = plugin_dir_url ( $this->file );
@@ -154,6 +150,8 @@ final class Code_Snippets {
 
 		$this->admin_manage_url	 = self_admin_url( 'admin.php?page=' . $this->admin_manage_slug );
 		$this->admin_single_url  = self_admin_url( 'admin.php?page=' . $this->admin_single_slug );
+
+		$this->set_table_vars();
 	}
 
 	/**
@@ -167,14 +165,14 @@ final class Code_Snippets {
 	function setup_hooks() {
 
 		/* execute the snippets once the plugins are loaded */
-		add_action( 'plugins_loaded', array( $this, 'run_snippets' ) );
+		add_action( 'plugins_loaded', array( $this, 'run_snippets' ), 1 );
 
 		/* add the administration menus */
-		add_action( 'admin_menu', array( $this, 'add_admin_menus' ) );
-		add_action( 'network_admin_menu', array( $this, 'add_network_admin_menus' ) );
+		add_action( 'admin_menu', array( $this, 'add_admin_menus' ), 5 );
+		add_action( 'network_admin_menu', array( $this, 'add_admin_menus' ), 5 );
 
 		/* register the importer */
-		add_action( 'admin_init', array( $this, 'load_importer' ), 999 );
+		add_action( 'admin_init', array( $this, 'load_importer' ) );
 		add_action( 'network_admin_menu', array( $this, 'add_import_admin_menu' ) );
 
 		/* load the translations */
@@ -185,7 +183,37 @@ final class Code_Snippets {
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_meta' ), 10, 2 );
 
 		/* Add a custom icon to Snippets menu pages */
-		add_action( 'admin_head', array( $this, 'load_admin_icon_style' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_icon_style' ) );
+
+		/* Register the table name with WordPress */
+		add_action( 'init', array( $this, 'set_table_vars' ), 1 );
+		add_action( 'switch_blog', array( $this, 'set_table_vars' ), 1 );
+
+		/* Add the description editor to the Snippets > Add New page */
+		add_action( 'code_snippets_admin_single', array( $this, 'description_editor_box' ), 5 );
+
+		/* Handle saving the user's screen option preferences */
+		add_filter( 'set-screen-option', array( $this, 'set_screen_option' ), 10, 3 );
+	}
+
+	/**
+	 * Initialize the variables holding the table names
+	 *
+	 * @since Code Snippets 1.7
+	 * @access public
+	 *
+	 * @uses $wpdb
+	 *
+	 * @return void
+	 */
+	public function set_table_vars() {
+		global $wpdb;
+
+		$wpdb->snippets    = apply_filters( 'code_snippets_table', $wpdb->prefix . 'snippets' );
+		$wpdb->ms_snippets = apply_filters( 'code_snippets_multisite_table', $wpdb->base_prefix . 'ms_snippets' );
+
+		$this->table       = &$wpdb->snippets;
+		$this->ms_snippets = &$wpdb->ms_snippets;
 	}
 
 	/**
@@ -236,6 +264,8 @@ final class Code_Snippets {
 	 */
 	function get_table_name( $scope = '', $check_screen = true ) {
 
+		global $wpdb;
+
 		$this->create_tables(); // create the snippet tables if they do not exist
 
 		if ( ! is_multisite() ) {
@@ -246,17 +276,17 @@ final class Code_Snippets {
 			$screen = get_current_screen();
 			$network = $screen->is_network;
 		}
-		elseif ( $scope == 'multisite' || $scope == 'network' ) {
+		elseif ( 'multisite' === $scope || 'network' === $scope ) {
 			$network = true;
 		}
-		elseif ( $scope == 'site' || $scope = 'single' ) {
+		elseif ( 'site' === $scope || 'single' === $scope ) {
 			$network = false;
 		}
 		else {
 			$network = false;
 		}
 
-		$table = ( $network ? $this->ms_table : $this->table );
+		$table = ( $network ? $wpdb->ms_snippets : $wpdb->snippets );
 
 		return $table;
 	}
@@ -268,17 +298,20 @@ final class Code_Snippets {
 	 * @access public
 	 *
 	 * @uses $this->create_table() To create a single snippet table
+	 * @uses $wpdb->get_var() To test of the table exists
 	 *
 	 * @return void
 	 */
 	public function create_tables() {
 
-		$this->create_table( $this->table );
+		global $wpdb;
 
-		if ( is_multisite() )
-			$this->create_table( $this->ms_table );
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$wpdb->snippets'" ) !== $wpdb->snippets )
+			$this->create_table( $wpdb->snippets );
 
-		add_site_option( 'code_snippets_version', $this->version );
+		if ( is_multisite() && $wpdb->get_var( "SHOW TABLES LIKE '$wpdb->ms_snippets'" ) !== $wpdb->ms_snippets )
+			$this->create_table( $wpdb->ms_snippets );
+
 	}
 
 	/**
@@ -288,25 +321,38 @@ final class Code_Snippets {
 	 * @since Code Snippets 1.6
 	 * @access public
 	 *
+	 * @uses dbDelta() To add the table to the database
+	 *
 	 * @param string $table_name The name of the table to create
 	 * @return void
 	 */
 	function create_table( $table_name ) {
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
 		global $wpdb;
 
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) != $table_name ) {
-			$sql = "CREATE TABLE $table_name (
-				id			MEDIUMINT	NOT NULL AUTO_INCREMENT,
-				name		VARCHAR(64)	NOT NULL,
-				description	TEXT,
-				code		TEXT		NOT NULL,
-				active		TINYINT(1)	NOT NULL DEFAULT 0,
-				UNIQUE KEY id (id)
-			);";
-			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-			dbDelta( $sql );
+		if ( ! empty( $wpdb->charset ) ) {
+			$charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
 		}
+
+		if ( ! empty( $wpdb->collate ) ) {
+			$charset_collate .= " COLLATE $wpdb->collate";
+		}
+
+		$sql = "CREATE TABLE $table_name (
+					id			bigint(20)	auto_increment,
+					name		tinytext	not null,
+					description	text,
+					code		longtext	not null,
+					active		tinyint(1)	not null default 0,
+				PRIMARY KEY  (id),
+					KEY id (id)
+
+				) {$charset_collate};";
+
+		dbDelta( apply_filters( 'code_snippets_table_sql', $sql ) );
+
+		do_action( 'code_snippets_create_table', $table_name );
 	}
 
 	/**
@@ -315,9 +361,10 @@ final class Code_Snippets {
 	 * @since Code Snippets 1.2
 	 * @access private
 	 *
-	 * @return bool True on successful upgrade, false on failure
+	 * @return void
 	 */
 	function upgrade() {
+		global $wpdb;
 
 		/* add backwards-compatibly for the CS_SAFE_MODE constant */
 		if ( defined( 'CS_SAFE_MODE' ) && ! defined( 'CODE_SNIPPETS_SAFE_MODE' ) ) {
@@ -334,54 +381,34 @@ final class Code_Snippets {
 			$this->current_version = get_site_option( 'code_snippets_version', $this->version );
 		}
 
-		/* bail early if we're on the latest version */
-		if ( $this->current_version < $this->version ) return false;
-
-		if ( ! get_site_option( 'code_snippets_version' ) ) {
+		if ( ! get_site_option( 'code_snippets_version' ) || $this->current_version < 1.5 ) {
 
 			/* This is the first time the plugin has run */
 
-			$this->add_caps(); // register the capabilities ONCE ONLY
+			$this->add_caps(); // register the capabilities once only
 
 			if ( is_multisite() ) {
-				$this->add_caps( 'multisite' ); // register the multisite capabilities ONCE ONLY
+				$this->add_caps( 'multisite' ); // register the multisite capabilities once only
 			}
 		}
 
-		/* migrate the recently_network_activated_snippets to the site options */
-		if ( is_multisite() && get_option( 'recently_network_activated_snippets' ) ) {
-			add_site_option( 'recently_activated_snippets', get_option( 'recently_network_activated_snippets', array() ) );
-			delete_option( 'recently_network_activated_snippets' );
-		}
+		/* skip this if we're on the latest version */
+		if ( get_site_option( 'code_snippets_version' ) < $this->version ) {
 
-		/* preform version specific upgrades */
-
-		if ( $this->current_version < 1.5 ) {
-			global $wpdb;
-
-			/* Let's alter the name column to accept up to 64 characters */
-			$wpdb->query( "ALTER TABLE $this->table CHANGE COLUMN name name VARCHAR(64) NOT NULL" );
-
-			if ( is_multisite() ) {
-				/* We must not forget the multisite table! */
-				$wpdb->query( "ALTER TABLE $this->ms_table CHANGE COLUMN name name VARCHAR(64) NOT NULL" );
+			/* migrate the recently_network_activated_snippets to the site options */
+			if ( is_multisite() && get_option( 'recently_network_activated_snippets' ) ) {
+				add_site_option( 'recently_activated_snippets', get_option( 'recently_network_activated_snippets', array() ) );
+				delete_option( 'recently_network_activated_snippets' );
 			}
 
-			/* Add the custom capabilities that were introduced in version 1.5 */
-			$this->add_roles();
-		}
+			if ( $this->current_version < 1.2 ) {
+				/* The 'Complete Uninstall' option was removed in version 1.2 */
+				delete_option( 'cs_complete_uninstall' );
+			}
 
-		if ( $this->current_version < 1.2 ) {
-			/* The 'Complete Uninstall' option was removed in version 1.2 */
-			delete_option( 'cs_complete_uninstall' );
-		}
-
-		if ( $this->current_version < $this->version ) {
 			/* Update the current version */
 			update_site_option( 'code_snippets_version', $this->version );
 		}
-
-		return true;
 	}
 
 	/**
@@ -389,7 +416,7 @@ final class Code_Snippets {
 	 * Place it in this plugin's "languages" folder and name it "code-snippets-[value in wp-config].mo"
 	 *
 	 * If you wish to contribute a language file to be included in the Code Snippets package,
-	 * please see the plugin's website at http://code-snippets.bungeshea.com
+	 * please see create an issue on GitHub: https://github.com/bungeshea/code-snippets/issues
 	 *
 	 * @since Code Snippets 1.5
 	 * @access private
@@ -398,6 +425,16 @@ final class Code_Snippets {
 	 */
 	function load_textdomain() {
 		load_plugin_textdomain( 'code-snippets', false, dirname( $this->basename ) . '/languages/' );
+	}
+
+	/**
+	 * Handles saving the user's screen option preference
+	 *
+	 * @since Code Snippets 1.5
+	 * @access private
+	 */
+	function set_screen_option( $status, $option, $value ) {
+		if ( 'snippets_per_page' === $option ) return $value;
 	}
 
 	/**
@@ -413,7 +450,7 @@ final class Code_Snippets {
 	 */
 	public function add_caps( $scope = '' ) {
 
-		$network = ( $scope == 'multisite' || $scope == 'network' ? true : false );
+		$network = ( 'multisite' === $scope || 'network' === $scope ? true : false );
 
 		if ( $network && is_multisite() )
 			$this->setup_ms_roles( 'add' );
@@ -434,7 +471,7 @@ final class Code_Snippets {
 	 */
 	public function remove_caps( $scope = '' ) {
 
-		$network = ( $scope == 'multisite' || $scope == 'network' ? true : false );
+		$network = ( 'multisite' === $scope || 'network' === $scope ? true : false );
 
 		if ( $network && is_multisite() )
 			$this->setup_ms_roles( 'remove' );
@@ -453,10 +490,10 @@ final class Code_Snippets {
 	 */
 	function setup_roles( $action = 'install' ) {
 
-		if ( $action == 'install' || $action = 'add' )
+		if ( 'install' === $action || 'add' === $action )
 			$install = true;
 
-		elseif ( $action == 'uninstall' || $action = 'remove' )
+		elseif ( 'uninstall' === $action || 'remove' === $action )
 			$install = false;
 
 		else
@@ -492,10 +529,10 @@ final class Code_Snippets {
 
 		if ( ! is_multisite() ) return;
 
-		if ( $action == 'install' || $action = 'add' )
+		if ( 'install' === $action || 'add' === $action )
 			$install = true;
 
-		elseif ( $action == 'uninstall' || $action = 'remove' )
+		elseif ( 'uninstall' === $action || 'remove' === $action )
 			$install = false;
 
 		else
@@ -527,94 +564,65 @@ final class Code_Snippets {
 	 *
 	 * @uses add_menu_page() To register a top-level menu
 	 * @uses add_submenu_page() To register a submenu page
-	 * @uses apply_filters() To retrieve the corrent menu slug
+	 * @uses apply_filters() To retrieve the current menu slug
 	 * @uses plugins_url() To retrieve the URL to a resource
 	 * @return void
 	 */
 	function add_admin_menus() {
 
+		/* Use a different screen icon for the MP6 interface */
+		if ( get_user_option( 'admin_color' )  !== 'mp6' )
+			$menu_icon = apply_filters( 'code_snippets_menu_icon', plugins_url( 'images/menu-icon.png', $this->file ) );
+		else
+			$menu_icon = 'div';
+
+		/* Add the top-level menu and relevant subpage */
 		$this->admin_manage = add_menu_page(
 			__('Snippets', 'code-snippets'),
 			__('Snippets', 'code-snippets'),
-			'manage_snippets',
-			apply_filters( 'code_snippets_manage_url', 'snippets' ),
+			is_network_admin() ? 'manage_network_snippets' : 'manage_snippets',
+			$this->admin_manage_slug,
 			array( $this, 'display_admin_manage' ),
-			plugins_url( 'images/icon16.png', $this->file ),
-			67
+			$menu_icon,
+			is_network_admin() ? 21 : 67
 		);
 
 		add_submenu_page(
-			apply_filters( 'code_snippets_manage_url', 'snippets' ),
+			$this->admin_manage_slug,
 			__('Snippets', 'code-snippets'),
-			__('Manage Snippets', 'code-snippets'),
-			'manage_snippets',
-			apply_filters( 'code_snippets_manage_url', 'snippets' ),
+			__('Manage', 'code-snippets'),
+			is_network_admin() ? 'manage_network_snippets' : 'manage_snippets',
+			$this->admin_manage_slug,
 			array( $this, 'display_admin_manage')
 		);
 
-		$this->admin_single = add_submenu_page(
-			apply_filters( 'code_snippets_manage_url', 'snippets' ),
-			__('Add New Snippet', 'code-snippets'),
-			__('Add New', 'code-snippets'),
-			'install_snippets',
-			apply_filters( 'code_snippets_single_url', 'snippet' ),
-			array( $this, 'display_admin_single' )
-		);
+		/* Add the Edit/Add New Snippet page */
+		if ( isset( $_REQUEST['page'], $_REQUEST['edit'] ) &&
+		     $this->admin_single_slug === $_REQUEST['page'] ) {
+
+			$this->admin_single = add_submenu_page(
+				$this->admin_manage_slug,
+				__('Edit Snippet', 'code-snippets'),
+				__('Edit', 'code-snippets'),
+				is_network_admin() ? 'install_network_snippets' : 'install_snippets',
+				$this->admin_single_slug,
+				array( $this, 'display_admin_single' )
+			);
+
+		} else {
+
+			$this->admin_single = add_submenu_page(
+				$this->admin_manage_slug,
+				__('Add New Snippet', 'code-snippets'),
+				__('Add New', 'code-snippets'),
+				is_network_admin() ? 'install_network_snippets' : 'install_snippets',
+				$this->admin_single_slug,
+				array( $this, 'display_admin_single' )
+			);
+		}
 
 		add_action( "load-$this->admin_manage", array( $this, 'load_admin_manage' ) );
 		add_action( "load-$this->admin_single", array( $this, 'load_admin_single' ) );
-
-		add_action( "admin_print_styles-$this->admin_single", array( $this, 'load_editor_styles' ) );
-		add_action( "admin_print_scripts-$this->admin_single", array( $this, 'load_editor_scripts' ) );
-	}
-
-	/**
-	 * Add the network dashboard admin menu and subpages
-	 *
-	 * @since Code Snippets 1.4
-	 * @access private
-	 *
-	 * @uses add_menu_page() To register a top-level menu
-	 * @uses add_submenu_page() To register a submenu page
-	 * @uses apply_filters() To retrieve the corrent menu slug
-	 * @uses plugins_url() To retrieve the URL to a resource
-	 * @return void
-	 */
-	function add_network_admin_menus() {
-
-		$this->admin_manage = add_menu_page(
-			__('Snippets', 'code-snippets'),
-			__('Snippets', 'code-snippets'),
-			'manage_network_snippets',
-			apply_filters( 'code_snippets_manage_url', 'snippets' ),
-			array( $this, 'display_admin_manage' ),
-			plugins_url( 'images/icon16.png', $this->file ),
-			21
-		);
-
-		add_submenu_page(
-			apply_filters( 'code_snippets_manage_url', 'snippets' ),
-			__('Snippets', 'code-snippets'),
-			__('Manage Snippets', 'code-snippets'),
-			'manage_network_snippets',
-			apply_filters( 'code_snippets_manage_url', 'snippets' ),
-			array( $this, 'display_admin_manage' )
-		);
-
-		$this->admin_single = add_submenu_page(
-			apply_filters( 'code_snippets_manage_url', 'snippets' ),
-			__('Add New Snippet', 'code-snippets'),
-			__('Add New', 'code-snippets'),
-			'install_network_snippets',
-			apply_filters( 'code_snippets_single_url', 'snippet' ),
-			array( $this, 'display_admin_single' )
-		);
-
-		add_action( "load-$this->admin_manage", array( $this, 'load_admin_manage' ) );
-		add_action( "load-$this->admin_single", array( $this, 'load_admin_single' ) );
-
-		add_action( "admin_print_styles-$this->admin_single", array( $this, 'load_editor_styles' ) );
-		add_action( "admin_print_scripts-$this->admin_single", array( $this, 'load_editor_scripts' ) );
 	}
 
 	/**
@@ -626,14 +634,14 @@ final class Code_Snippets {
 	 * @access private
 	 *
 	 * @uses add_submenu_page() To register the menu page
-	 * @uses apply_filters() To retrieve the corrent menu slug
+	 * @uses apply_filters() To retrieve the current menu slug
 	 * @uses add_action() To enqueue scripts and styles
 	 * @return void
 	 */
 	function add_import_admin_menu() {
 
 		$this->admin_import = add_submenu_page(
-			apply_filters( 'code_snippets_manage_url', 'snippets' ),
+			$this->admin_manage_slug,
 			__('Import Snippets', 'code-snippets'),
 			__('Import', 'code-snippets'),
 			'import_snippets',
@@ -642,7 +650,6 @@ final class Code_Snippets {
 		);
 
 		$this->admin_import_url = self_admin_url( 'admin.php?page=import-code-snippets' );
-		add_action( "admin_print_styles-$this->admin_import", array( $this, 'load_stylesheet' ) );
 		add_action( "load-$this->admin_import", array( $this, 'load_admin_import' ) );
 	}
 
@@ -658,122 +665,190 @@ final class Code_Snippets {
 	 */
 	function load_admin_icon_style() {
 
-		wp_enqueue_style(
-			'icon-snippets',
-			plugins_url( 'assets/icon.css', $this->file ),
-			false,
-			$this->version
-		);
+		if ( get_user_option( 'admin_color' )  === 'mp6' ) {
+
+			wp_enqueue_style(
+				'icon-snippets',
+				plugins_url( 'assets/menu-icon.mp6.css', $this->file ),
+				false,
+				$this->version
+			);
+
+		} else {
+
+			wp_enqueue_style(
+				'icon-snippets',
+				plugins_url( 'assets/screen-icon.css', $this->file ),
+				false,
+				$this->version
+			);
+		}
 	}
 
 	/**
-	 * Registers and loads the code editor's scripts
+	 * Converts an array of snippet data into a snippet object
 	 *
-	 * @since Code Snippets 1.4
-	 * @access private
+	 * @since Code Snippets 1.7
+	 * @access public
 	 *
-	 * @uses wp_register_script()
-	 * @uses wp_enqueue_style() To add the scripts to the queue
-	 *
-	 * @return void
+	 * @param mixed $data The snippet data to convert
+	 * @return object The resulting snippet object
 	 */
-	function load_editor_scripts() {
+	public function build_snippet_object( $data = null ) {
 
-		/* CodeMirror package version */
-		$version = '3.0';
+		$snippet = new stdClass;
 
-		/* CodeMirror base framework */
+		// define an empty snippet object (or one with default values )
+		$snippet->id = 0;
+		$snippet->name = '';
+		$snippet->description = '';
+		$snippet->code = '';
+		$snippet->active = 0;
+		$snippet = apply_filters( 'code_snippets_build_default_snippet', $snippet );
 
-		wp_register_script(
-			'codemirror',
-			plugins_url( 'assets/codemirror.js', $this->file ),
-			false,
-			$version
-		);
+		if ( ! isset( $data ) ) {
+			return $snippet;
+		}
+		elseif ( is_object( $data ) ) {
+			/* If we already have a snippet object, merge it with the default */
+			return (object) array_merge( (array) $snippet, (array) $data );
+		}
+		elseif ( is_array( $data ) ) {
 
-		/* CodeMirror modes */
+			if ( isset( $data['id'] ) )
+				$snippet->id = $data['id'];
+			elseif ( isset( $data['snippet_id'] ) )
+				$snippet->id = $data['snippet_id'];
 
-		$modes = array( 'php', 'xml', 'javascript', 'css', 'clike', 'htmlmixed' );
+			if ( isset( $data['name'] ) )
+				$snippet->name = $data['name'];
+			elseif ( isset( $data['snippet_name'] ) )
+				$snippet->name = $data['snippet_name'];
 
-		foreach ( $modes as $mode ) {
+			if ( isset( $data['description'] ) )
+				$snippet->description = $data['description'];
+			elseif ( isset( $data['snippet_description'] ) )
+				$snippet->description = $data['snippet_description'];
 
-			wp_register_script(
-				"codemirror-mode-$mode",
-				plugins_url( "assets/mode/$mode.js", $this->file ),
-				array( 'codemirror' ),
-				$version
-			);
+			if ( isset( $data['code'] ) )
+				$snippet->code = $data['code'];
+			elseif ( isset( $data['snippet_code'] ) )
+				$snippet->code = $data['snippet_code'];
+
+
+			if ( isset( $data['active' ] ) )
+				$snippet->active = $data['active'];
+			elseif ( isset( $data['snippet_active'] ) )
+				$snippet->active = $data['snippet_active'];
+
+			return apply_filters( 'code_snippets_build_snippet_object', $snippet, $data );
 		}
 
-		/* CodeMirror utilities */
-
-		$utils = array( 'dialog', 'searchcursor', 'search', 'matchbrackets' );
-
-		foreach ( $utils as $util ) {
-
-			wp_register_script(
-				"codemirror-util-$util",
-				plugins_url( "assets/util/$util.js", $this->file ),
-				array( 'codemirror' ),
-				$version
-			);
-		}
-
-		/* Enqueue the registered scripts */
-
-		wp_enqueue_script( array(
-			'codemirror-util-matchbrackets',
-			'codemirror-mode-htmlmixed',
-			'codemirror-mode-xml',
-			'codemirror-mode-js',
-			'codemirror-mode-css',
-			'codemirror-mode-clike',
-			'codemirror-mode-php',
-			'codemirror-util-search',
-		) );
+		return $snippet;
 	}
 
 	/**
-	 * Registers and loads the code editor's styles
+	 * Retrieve a list of snippets from the database
 	 *
-	 * @since Code Snippets 1.4
-	 * @access private
+	 * @since Code Snippets 1.7
+	 * @access public
 	 *
-	 * @uses wp_register_style()
-	 * @uses wp_enqueue_style() To add the stylesheets to the queue
+	 * @uses $wpdb To query the database for snippets
+	 * @uses $this->get_table_name() To dynamically retrieve the snippet table name
 	 *
-	 * @return void
+	 * @param string $scope Retrieve multisite-wide or site-wide snippets?
+	 * @return array An array of snippet objects
 	 */
-	function load_editor_styles() {
+	 public function get_snippets( $scope = '' ) {
+		global $wpdb;
 
-		/* CodeMirror package version */
-		$version = '3.0';
+		$table = $this->get_table_name( $scope );
+		$snippets = $wpdb->get_results( "SELECT * FROM $table", ARRAY_A );
 
-		/* CodeMirror base framework */
+		foreach( $snippets as $index => $snippet ) {
+			$snippets[ $index ] = $this->unescape_snippet_data( $snippet );
+		}
 
-		wp_register_style(
-			'codemirror',
-			plugins_url( 'assets/codemirror.css', $this->file ),
-			false,
-			$version
-		);
+		return apply_filters( 'code_snippets_get_snippets', $snippets, $scope );
+	}
 
-		/* CodeMirror utilities */
+	/**
+	 * Escape snippet data for inserting into the database
+	 *
+	 * @since Code Snippets 1.7
+	 * @access public
+	 *
+	 * @param mixed $snippet An object or array containing the data to escape
+	 * @return object The resulting snippet object, with data escaped
+	 */
+	public function escape_snippet_data( $snippet ) {
 
-		wp_register_style(
-			'codemirror-util-dialog',
-			plugins_url( 'assets/util/dialog.css', $this->file ),
-			array( 'codemirror' ),
-			$version
-		);
+		$snippet = $this->build_snippet_object( $snippet );
 
-		/* Enqueue the registered stylesheets */
+		/* remove the <?php and ?> tags from the snippet */
+		$snippet->code = trim ( $snippet->code );
+		$snippet->code = ltrim( $snippet->code, '<?php' );
+		$snippet->code = ltrim( $snippet->code, '<?' );
+		$snippet->code = rtrim( $snippet->code, '?>' );
 
-		wp_enqueue_style( array(
-			'codemirror',
-			'codemirror-util-dialog',
-		) );
+		/* escape the data */
+		$snippet->name = mysql_real_escape_string( htmlspecialchars( $snippet->name ) );
+		$snippet->description = mysql_real_escape_string( htmlspecialchars( $snippet->description ) );
+		$snippet->code = mysql_real_escape_string( htmlspecialchars( $snippet->code ) );
+		$snippet->id = intval( $snippet->id );
 
+		return apply_filters( 'code_snippets_escape_snippet_data', $snippet );
+	}
+
+	/**
+	 * Unescape snippet data after retrieving from the database
+	 * ready for use
+	 *
+	 * @since Code Snippets 1.7
+	 * @access public
+	 *
+	 * @param mixed $snippet An object or array containing the data to unescape
+	 * @return object The resulting snippet object, with data unescaped
+	 */
+	public function unescape_snippet_data( $snippet ) {
+
+		$snippet = $this->build_snippet_object( $snippet );
+
+		$snippet->name = htmlspecialchars_decode( stripslashes( $snippet->name ) );
+		$snippet->code = htmlspecialchars_decode( stripslashes( $snippet->code ) );
+		$snippet->description = htmlspecialchars_decode( stripslashes( $snippet->description ) );
+
+		return apply_filters( 'code_snippets_unescape_snippet_data', $snippet );
+	}
+
+	/**
+	 * Retrieve a single snippets from the database
+	 * Will return empty snippet object if no snippet
+	 * ID is specified
+	 *
+	 * @since Code Snippets 1.7
+	 * @access public
+	 *
+	 * @uses $wpdb To query the database for snippets
+	 * @uses $this->get_table_name() To dynamically retrieve the snippet table name
+	 *
+	 * @param string $scope Retrieve a multisite-wide or site-wide snippet?
+	 * @return object A single snippet object
+	 */
+	 public function get_snippet( $id = 0, $scope = '' ) {
+		global $wpdb;
+		$table = $this->get_table_name( $scope );
+
+		if ( ! empty( $id ) && 0 !== intval( $id ) ) {
+			/* Retrieve the snippet from the database */
+			$snippet = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", $id ) );
+			/* Unescape the snippet data, ready for use */
+			$snippet = $this->unescape_snippet_data( $snippet );
+		} else {
+			// get an empty snippet object
+			$snippet = $this->build_snippet_object();
+		}
+		return apply_filters( 'code_snippets_get_snippet', $snippet, $id, $scope );
 	}
 
 	/**
@@ -803,7 +878,11 @@ final class Code_Snippets {
 				array( '%d' ),
 				array( '%d' )
 			);
+
+			do_action( 'code_snippets_activate_snippet', $id, $scope );
 		}
+
+		do_action( 'code_snippets_activate', $ids, $scope );
 	}
 
 	/**
@@ -835,18 +914,22 @@ final class Code_Snippets {
 				array( '%d' )
 			);
 			$recently_active = array( $id => time() ) + (array) $recently_active;
+
+			do_action( 'code_snippets_deactivate_snippet', $id, $scope );
 		}
 
-		if ( $table == $this->ms_table )
+		if ( $table === $wpdb->ms_snippets )
 			update_site_option(
 				'recently_activated_snippets',
 				$recently_active + (array) get_site_option( 'recently_activated_snippets' )
 			);
-		else
+		elseif ( $table === $wpdb->snippets )
 			update_option(
 				'recently_activated_snippets',
 				$recently_active + (array) get_option( 'recently_activated_snippets' )
 			);
+
+		do_action( 'code_snippets_deactivate', $ids, $scope );
 	}
 
 	/**
@@ -862,9 +945,10 @@ final class Code_Snippets {
 		global $wpdb;
 
 		$table = $this->get_table_name( $scope );
-		$id = intval( $id );
 
-		$wpdb->query( "DELETE FROM $table WHERE id='$id' LIMIT 1" );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $table WHERE id='%d' LIMIT 1", intval( $id ) ) );
+
+		do_action( 'code_snippets_delete_snippet', $id, $scope );
 	}
 
 	/**
@@ -876,34 +960,43 @@ final class Code_Snippets {
 	 * @uses $wpdb To update/add the snippet to the database
 	 * @uses $this->get_table_name() To dynamically retrieve the name of the snippet table
 	 *
-	 * @param array $snippet The snippet to add/update to the database
+	 * @param object $snippet The snippet to add/update to the database
 	 * @return int|bool The ID of the snippet on success, false on failure
 	 */
 	public function save_snippet( $snippet, $scope = '' ) {
 		global $wpdb;
 
-		$name = mysql_real_escape_string( htmlspecialchars( $snippet['name'] ) );
-		$description = mysql_real_escape_string( htmlspecialchars( $snippet['description'] ) );
-		$code = mysql_real_escape_string( htmlspecialchars( $snippet['code'] ) );
+		$snippet = $this->escape_snippet_data( $snippet );
 
-		if ( empty( $name ) or empty( $code ) )
+		if ( empty( $snippet->name ) or empty( $snippet->code ) )
 			return false;
 
 		$table = $this->get_table_name( $scope );
 
-		if ( isset( $snippet['id'] ) && ( intval( $snippet['id'] ) != 0 )  ) {
-			$wpdb->query( "UPDATE $table SET
-				name='$name',
-				description='$description',
-				code='$code' WHERE id=" . intval( $snippet['id'] ) . "
-				LIMIT 1"
-			);
-			return intval( $snippet['id'] );
+		$fields = '';
+		foreach ( get_object_vars( $snippet ) as $field => $value ) {
+			if ( 'id' !== $field ) {
+				$fields .= "{$field}='{$value}',";
+			}
+		}
+		$fields = rtrim( $fields, ',' );
+
+		if ( isset( $snippet->id ) && 0 !== $snippet->id ) {
+
+			if ( $fields ) {
+				$wpdb->query( $wpdb->prepare( "UPDATE $table SET $fields WHERE id='%d' LIMIT 1", $snippet->id ) );
+			}
+
+			do_action( 'code_snippets_update_snippet', $snippet, $table );
+			return $snippet->id;
+
 		} else {
-			$wpdb->query(
-				"INSERT INTO $table(name,description,code)
-				VALUES ('$name','$description','$code')"
-			);
+
+			if ( $fields ) {
+				$wpdb->query( "INSERT INTO $table SET $fields" );
+			}
+
+			do_action( 'code_snippets_create_snippet', $snippet, $table );
 			return $wpdb->insert_id;
 		}
 	}
@@ -914,7 +1007,7 @@ final class Code_Snippets {
 	 * @since Code Snippets 1.5
 	 * @access public
 	 *
-	 * @uses $this->save_snippet() To add the snippets to the database
+ 	 * @uses $this->save_snippet() To add the snippets to the database
 	 *
 	 * @param file $file The path to the XML file to import
 	 * @param string $scope Import into network-wide table or site-wide table?
@@ -927,13 +1020,14 @@ final class Code_Snippets {
 
 		$xml = simplexml_load_file( $file );
 
-		foreach ( $xml->children() as $child ) {
-			$this->save_snippet( array(
-				'name' => $child->name,
-				'description' => $child->description,
-				'code' => $child->code,
-			), $scope );
+		foreach ( $xml->children() as $snippet ) {
+			/* force manual build of object to strip out unsupported fields
+			   by converting snippet object into array */
+			$this->save_snippet( get_object_vars( $snippet ), $scope );
 		}
+
+		do_action( 'code_snippets_import', $xml, $scope );
+
 		return $xml->count();
 	}
 
@@ -1000,7 +1094,45 @@ final class Code_Snippets {
 		$result = eval( $code );
 		$output = ob_get_contents();
 		ob_end_clean();
+		do_action( 'code_snippets_execute_snippet', $code );
 		return $result;
+	}
+
+	/**
+	 * Returns the (de)activate link for a snippet
+	 *
+	 * @since Code Snippets 1.7
+	 * @access public
+	 *
+	 * @param mixed $snippet A snippet object
+	 * @return The HTML code for the (de)activation link
+	 */
+	public function get_activate_link( $snippet ) {
+
+		$snippet = $this->build_snippet_object( $snippet );
+		$screen = get_current_screen();
+
+		if ( $snippet->active ) {
+			$activate_link = sprintf(
+				'<a href="%1$s">%2$s</a>',
+				add_query_arg( array(
+					'action' => 'deactivate',
+					'id' =>	$snippet->id
+				), $this->admin_manage_url ),
+				$screen->is_network ? __('Network Deactivate', 'code-snippets') : __('Deactivate', 'code-snippets')
+			);
+		} else {
+			$activate_link = sprintf(
+				'<a href="%1$s">%2$s</a>',
+				add_query_arg( array(
+					'action' => 'activate',
+					'id' =>	$snippet->id
+				), $this->admin_manage_url ),
+				$screen->is_network ? __('Network Activate', 'code-snippets') : __('Activate', 'code-snippets')
+			);
+		}
+
+		return apply_filters( 'code_snippets_activate_link', $activate_link, $snippet );
 	}
 
 	/**
@@ -1041,23 +1173,29 @@ final class Code_Snippets {
 
 			$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'action', 'id' ) );
 
-			if ( 'activate' == $_GET['action'] ) {
+			$action = sanitize_key( $_GET['action'] );
+
+			if ( 'activate' === $action ) {
 				$this->activate( $id );
-				wp_redirect( add_query_arg( 'activate', true ) );
 			}
-			elseif ( 'deactivate' == $_GET['action'] ) {
+			elseif ( 'deactivate' === $action ) {
 				$this->deactivate( $id );
-				wp_redirect( add_query_arg( 'deactivate', true ) );
 			}
-			elseif ( 'delete' == $_GET['action'] ) {
+			elseif ( 'delete' === $action ) {
 				$this->delete_snippet( $id );
-				wp_redirect( add_query_arg( 'delete', true ) );
 			}
-			elseif ( 'export' == $_GET['action'] ) {
+			elseif ( 'export' === $action ) {
 				$this->export( $id );
 			}
-			elseif ( 'export-php' == $_GET['action'] ) {
+			elseif ( 'export-php' === $action ) {
 				$this->export_php( $id );
+			}
+
+			if ( 'export' !== $action || 'export-php' !== $action ) {
+				wp_redirect( apply_filters(
+					"code_snippets_{$action}_redirect",
+					add_query_arg( $action, true )
+				) );
 			}
 
 		endif;
@@ -1069,9 +1207,8 @@ final class Code_Snippets {
 		 */
 		require_once $this->plugin_dir . 'includes/class-list-table.php';
 
-		global $code_snippets_list_table;
-		$code_snippets_list_table = new Code_Snippets_List_Table();
-		$code_snippets_list_table->prepare_items();
+		$this->list_table = new Code_Snippets_List_Table();
+		$this->list_table->prepare_items();
 	}
 
 	/**
@@ -1087,26 +1224,24 @@ final class Code_Snippets {
 	 */
 	function load_admin_single() {
 
+		$screen = get_current_screen();
+		$can_edit = current_user_can( $screen->is_network ? 'edit_network_snippets' : 'edit_snippets' );
+
+		if ( isset( $_REQUEST['edit'] ) && ! $can_edit )
+			wp_die( __("Sorry, you're not allowed to edit snippets", 'code-snippets') );
+
 		$this->create_tables(); // create the snippet tables if they do not exist
 
-		if ( isset( $_REQUEST['save_snippet'] ) ) {
+		if ( isset( $_REQUEST['save_snippet'] ) || isset( $_REQUEST['save_snippet_activate'] ) ) {
 
-			if ( isset( $_REQUEST['snippet_id'] ) ) {
-				$result = $this->save_snippet( array(
-					'name' => $_REQUEST['snippet_name'],
-					'description' => $_REQUEST['snippet_description'],
-					'code' => $_REQUEST['snippet_code'],
-					'id' => $_REQUEST['snippet_id'],
-				) );
-			} else {
-				$result = $this->save_snippet( array(
-					'name' => $_REQUEST['snippet_name'],
-					'description' => $_REQUEST['snippet_description'],
-					'code' => $_REQUEST['snippet_code'],
-				) );
+			$result = $this->save_snippet( $_POST );
+
+			$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'added', 'updated', 'activated', 'invalid' ) );
+
+			if ( isset( $_REQUEST['save_snippet_activate'] ) && $result ) {
+				$this->activate( $result );
+				$_SERVER['REQUEST_URI'] = add_query_arg( 'activated', true );
 			}
-
-			$_SERVER['REQUEST_URI'] = remove_query_arg( array( 'added', 'updated', 'invalid' ) );
 
 			if ( ! $result || $result < 1 ) {
 				wp_redirect( add_query_arg( 'invalid', true ) );
@@ -1130,6 +1265,99 @@ final class Code_Snippets {
 
 		include $this->plugin_dir . 'includes/help/single.php'; // Load the help tabs
 
+		add_filter( 'admin_enqueue_scripts', array( $this, 'admin_single_enqueue_scripts' ) );
+	}
+
+	/**
+	 * Registers and loads the code editor's scripts
+	 *
+	 * @since Code Snippets 1.7
+	 * @access private
+	 *
+	 * @uses wp_register_script()
+	 * @uses wp_register_style()
+	 * @uses wp_enqueue_script() To add the scripts to the queue
+	 * @uses wp_enqueue_style() To add the stylesheets to the queue
+	 *
+	 * @return void
+	 */
+	function admin_single_enqueue_scripts() {
+
+		/* CodeMirror package version */
+		$codemirror_version = '3.11';
+
+		/* CodeMirror base framework */
+
+		wp_register_script(
+			'codemirror',
+			plugins_url( 'assets/codemirror/lib/codemirror.js', $this->file ),
+			false,
+			$codemirror_version
+		);
+
+		wp_register_style(
+			'codemirror',
+			plugins_url( 'assets/codemirror/lib/codemirror.css', $this->file ),
+			false,
+			$codemirror_version
+		);
+
+		/* CodeMirror modes */
+
+		$modes = array( 'php', 'clike' );
+
+		foreach ( $modes as $mode ) {
+
+			wp_register_script(
+				"codemirror-mode-$mode",
+				plugins_url( "assets/codemirror/mode/$mode.js", $this->file ),
+				array( 'codemirror' ),
+				$codemirror_version
+			);
+		}
+
+		/* CodeMirror addons */
+
+		$addons = array( 'dialog', 'searchcursor', 'search', 'matchbrackets' );
+
+		foreach ( $addons as $addon ) {
+
+			wp_register_script(
+				"codemirror-addon-$addon",
+				plugins_url( "assets/codemirror/addon/$addon.js", $this->file ),
+				array( 'codemirror' ),
+				$codemirror_version
+			);
+		}
+
+		wp_register_style(
+			'codemirror-addon-dialog',
+			plugins_url( 'assets/codemirror/addon/dialog.css', $this->file ),
+			array( 'codemirror' ),
+			$codemirror_version
+		);
+
+		/* Enqueue the registered scripts */
+		wp_enqueue_script( array(
+			'codemirror-addon-matchbrackets',
+			'codemirror-mode-clike',
+			'codemirror-mode-php',
+			'codemirror-addon-search',
+		) );
+
+		/* Enqueue the registered stylesheets */
+		wp_enqueue_style( array(
+			'codemirror',
+			'codemirror-addon-dialog',
+		) );
+
+		/* Enqueue custom styling */
+		wp_enqueue_style(
+			'code-snippets-admin-single',
+			plugins_url( 'assets/admin-single.css', $this->file ),
+			false,
+			$this->version
+		);
 	}
 
 	/**
@@ -1193,6 +1421,37 @@ final class Code_Snippets {
 	}
 
 	/**
+	 * Add a description editor to the Add New/Edit Snippet page
+	 *
+	 * @since Code Snippets 1.7
+	 * @access private
+	 *
+	 */
+	function description_editor_box( $snippet ) {
+		?>
+
+		<label for="snippet_description">
+			<h3><div style="position: absolute;"><?php _e('Description', 'code-snippets');
+			?> <span style="font-weight: normal;"><?php esc_html_e('(Optional)', 'code-snippets'); ?></span></div></h3>
+		</label>
+
+		<?php
+
+		remove_editor_styles(); // stop custom theme styling interfering with the editor
+
+		wp_editor(
+			$snippet->description,
+			'description',
+			apply_filters( 'code_snippets_description_editor_settings', array(
+				'textarea_name' => 'snippet_description',
+				'textarea_rows' => 10,
+				'teeny' => true,
+				'media_buttons' => false,
+			) )
+		);
+	}
+
+	/**
 	 * Adds a link pointing to the Manage Snippets page
 	 *
 	 * @since Code Snippets 1.0
@@ -1218,7 +1477,7 @@ final class Code_Snippets {
 	 */
 	function plugin_meta( $links, $file ) {
 
-		if ( $file != $this->basename ) return $links;
+		if ( $file !== $this->basename ) return $links;
 
 		$format = '<a href="%1$s" title="%2$s">%3$s</a>';
 
@@ -1235,7 +1494,7 @@ final class Code_Snippets {
 			),
 			sprintf( $format,
 				'http://code-snippets.bungeshea.com/donate/',
-				__('Support this plugin\'s development', 'code-snippets'),
+				__("Support this plugin's development", 'code-snippets'),
 				__('Donate', 'code-snippets')
 			)
 		) );
@@ -1256,17 +1515,24 @@ final class Code_Snippets {
 	 */
 	function run_snippets() {
 
-		if ( defined( 'CODE_SNIPPETS_SAFE_MODE' ) && CODE_SNIPPETS_SAFE_MODE )
-			return;
+		if ( defined( 'CODE_SNIPPETS_SAFE_MODE' ) && CODE_SNIPPETS_SAFE_MODE ) return;
 
 		global $wpdb;
+		$active_snippets = array();
 
-		// grab the active snippets from the database
-		$active_snippets = $wpdb->get_results( "SELECT code FROM $this->table WHERE active=1;" );
+		// check that the table exists before continuing
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->snippets}';" ) ) {
 
-		if ( is_multisite() ) {
+			// grab the active snippets from the database
+			$active_snippets = $wpdb->get_col( "SELECT code FROM {$wpdb->snippets} WHERE active=1;" );
+
+		}
+
+		if ( is_multisite() && $wpdb->get_var( "SHOW TABLES LIKE '{$wpdb->ms_snippets}';" ) ) {
+
+			// grab the network active snippets from the database
 			$active_snippets = array_merge(
-				$wpdb->get_results( "SELECT code FROM $this->ms_table WHERE active=1;" ),
+				$wpdb->get_col( "SELECT code FROM {$wpdb->ms_snippets} WHERE active=1;" ),
 				$active_snippets
 			);
 		}
@@ -1274,7 +1540,7 @@ final class Code_Snippets {
 		if ( count( $active_snippets ) ) {
 			foreach( $active_snippets as $snippet ) {
 				// execute the php code
-				$this->execute_snippet( htmlspecialchars_decode( stripslashes( $snippet->code ) ) );
+				$this->execute_snippet( htmlspecialchars_decode( stripslashes( $snippet ) ) );
 			}
 		}
 	}
@@ -1292,8 +1558,6 @@ $code_snippets = new Code_Snippets;
 /* set up a pointer in the old variable (for backwards-compatibility) */
 global $cs;
 $cs = &$code_snippets;
-
-endif; // class exists check
 
 register_uninstall_hook( $code_snippets->file, 'code_snippets_uninstall' );
 
@@ -1315,26 +1579,27 @@ register_uninstall_hook( $code_snippets->file, 'code_snippets_uninstall' );
 function code_snippets_uninstall() {
 	global $wpdb, $code_snippets;
 	if ( is_multisite() ) {
-		$blogs = $wpdb->get_results( "SELECT blog_id FROM $wpdb->blogs", ARRAY_A );
-		if ( $blogs ) {
-			foreach( $blogs as $blog ) {
-				switch_to_blog( $blog['blog_id'] );
-				$wpdb->query( 'DROP TABLE IF EXISTS ' . apply_filters( 'code_snippets_table', $wpdb->prefix . 'snippets' ) );
+		$blog_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" );
+		if ( $blog_ids ) {
+			foreach ( $blog_ids as $blog_id ) {
+				switch_to_blog( $blog_id );
+				$wpdb->query( "DROP TABLE IF EXISTS $wpdb->snippets" );
 				delete_option( 'cs_db_version' );
 				delete_option( 'recently_activated_snippets' );
 				$code_snippets->remove_caps();
 			}
 			restore_current_blog();
 		}
-		$wpdb->query( 'DROP TABLE IF EXISTS ' . $code_snippets->get_table_name( 'multisite' ) );
+		$wpdb->query( "DROP TABLE IF EXISTS $wpdb->ms_snippets" );
 		delete_site_option( 'recently_activated_snippets' );
 		$code_snippets->remove_caps( 'multisite' );
 	} else {
-		$wpdb->query( 'DROP TABLE IF EXISTS ' . $code_snippets->get_table_name( 'site' ) );
+		$wpdb->query( "DROP TABLE IF EXISTS $wpdb->snippets" );
 		delete_option( 'recently_activated_snippets' );
 		delete_option( 'cs_db_version' );
 		$code_snippets->remove_caps();
 	}
-
 	delete_site_option( 'code_snippets_version' );
 }
+
+endif; // class exists check
