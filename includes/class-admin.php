@@ -181,7 +181,7 @@ class Code_Snippets_Admin {
 		$this->manage_page = add_menu_page(
 			__('Snippets', 'code-snippets'),
 			__('Snippets', 'code-snippets'),
-			is_multisite() ? 'manage_network_snippets' : 'manage_snippets',
+			$code_snippets->get_cap( 'manage' ),
 			$this->manage_slug,
 			array( $this, 'display_manage_menu' ),
 			$menu_icon,
@@ -192,7 +192,7 @@ class Code_Snippets_Admin {
 			$this->manage_slug,
 			__('Snippets', 'code-snippets'),
 			__('Manage', 'code-snippets'),
-			$code_snippets->user_can( 'manage' ),
+			$code_snippets->get_cap( 'manage' ),
 			$this->manage_slug,
 			array( $this, 'display_manage_menu')
 		);
@@ -204,7 +204,7 @@ class Code_Snippets_Admin {
 			$this->manage_slug,
 			$editing ? __('Edit Snippet', 'code-snippets') : __('Add New Snippet', 'code-snippets'),
 			$editing ? __('Edit', 'code-snippets') : __('Add New', 'code-snippets'),
-			$code_snippets->user_can( 'install' ),
+			$code_snippets->get_cap( 'install' ),
 			$this->single_slug,
 			array( $this, 'display_single_menu' )
 		);
@@ -236,7 +236,7 @@ class Code_Snippets_Admin {
 			$this->manage_slug,
 			__('Import Snippets', 'code-snippets'),
 			__('Import', 'code-snippets'),
-			$code_snippets->user_can( 'import' ),
+			$code_snippets->get_cap( 'import' ),
 			'import-code-snippets',
 			array( $this, 'display_import_menu' )
 		);
@@ -380,14 +380,14 @@ class Code_Snippets_Admin {
 
 		wp_register_script(
 			'codemirror',
-			plugins_url( 'assets/codemirror/lib/codemirror.js', $code_snippets->file ),
+			plugins_url( 'vendor/codemirror/lib/codemirror.js', $code_snippets->file ),
 			false,
 			$codemirror_version
 		);
 
 		wp_register_style(
 			'codemirror',
-			plugins_url( 'assets/codemirror/lib/codemirror.css', $code_snippets->file ),
+			plugins_url( 'vendor/codemirror/lib/codemirror.css', $code_snippets->file ),
 			false,
 			$codemirror_version
 		);
@@ -400,7 +400,7 @@ class Code_Snippets_Admin {
 
 			wp_register_script(
 				"codemirror-mode-$mode",
-				plugins_url( "assets/codemirror/mode/$mode.js", $code_snippets->file ),
+				plugins_url( "vendor/codemirror/mode/$mode.js", $code_snippets->file ),
 				array( 'codemirror' ),
 				$codemirror_version
 			);
@@ -414,7 +414,7 @@ class Code_Snippets_Admin {
 
 			wp_register_script(
 				"codemirror-addon-$addon",
-				plugins_url( "assets/codemirror/addon/$addon.js", $code_snippets->file ),
+				plugins_url( "vendor/codemirror/addon/$addon.js", $code_snippets->file ),
 				array( 'codemirror' ),
 				$codemirror_version
 			);
@@ -422,7 +422,7 @@ class Code_Snippets_Admin {
 
 		wp_register_style(
 			'codemirror-addon-dialog',
-			plugins_url( 'assets/codemirror/addon/dialog.css', $code_snippets->file ),
+			plugins_url( 'vendor/codemirror/addon/dialog.css', $code_snippets->file ),
 			array( 'codemirror' ),
 			$codemirror_version
 		);

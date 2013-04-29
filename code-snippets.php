@@ -16,7 +16,7 @@
  * Description: An easy, clean and simple way to add code snippets to your site. No need to edit to your theme's functions.php file again!
  * Author: Shea Bunge
  * Author URI: http://bungeshea.com
- * Version: 1.7.1
+ * Version: 1.7.1.1
  * License: MIT
  * License URI: license.txt
  * Text Domain: code-snippets
@@ -53,7 +53,7 @@ final class Code_Snippets {
 	 * @access public
 	 * @var string A PHP-standardized version number string
 	 */
-	public $version = '1.7.1';
+	public $version = '1.7.1.1';
 
 	/**
 	 * Variables to hold plugin paths
@@ -512,25 +512,41 @@ final class Code_Snippets {
 	/**
 	 * Check if the current user can perform some action on snippets or not
 	 *
-	 * If multisite, checks if *Enable Administration Menus: Snippets* is active
-	 * under the *Settings > Network Settings* network admin menu
-	 *
-	 * @uses current_user_can() To check if the current user can perform a task
+	 * @uses   current_user_can() To check if the current user can perform a task
+	 * @uses   $this->get_cap() To get the required capability
 	 *
 	 * @param  string $do_what The task to check against.
 	 * @return bool            Whether the current user can perform this task or not
+	 *
+	 * @since  1.7.1.1 Moved logic to $this->get_cap() method
+	 * @since  1.7.1
+	 * @access public
 	 */
 	public function user_can( $do_what ) {
+		return current_user_can( $this->get_cap( $do_what ) );
+	}
+
+	/**
+	 * Get the required capability to perform a certain action on snippets.
+	 * Does not check if the user has this capability or not.
+	 *
+	 * If multisite, checks if *Enable Administration Menus: Snippets* is active
+	 * under the *Settings > Network Settings* network admin menu
+	 *
+	 * @since  1.7.1.1
+	 * @access public
+	 */
+	public function get_cap( $do_what ) {
 
 		if ( is_multisite() ) {
 
 			if ( in_array( 'snippets', get_site_option( 'menu_items' ) ) )
-				return current_user_can( "{$do_what}_snippets" );
+				return "{$do_what}_snippets";
 			else
-				return current_user_can( "{$do_what}_network_snippets" );
+				return "{$do_what}_network_snippets";
 
 		} else {
-			return current_user_can( "{$do_what}_snippets" );
+			return "{$do_what}_snippets";
 		}
 	}
 
