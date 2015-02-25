@@ -71,7 +71,7 @@ function code_snippets_load_manage_menu() {
 	add_action( 'admin_enqueue_scripts', 'code_snippets_manage_menu_assets' );
 
 	/* Create the snippet tables if they don't exist */
-	create_code_snippets_tables( true, true );
+	create_code_snippets_tables();
 
 	/* Load the screen help tabs */
 	require plugin_dir_path( __FILE__ ) . 'admin-help.php';
@@ -104,3 +104,21 @@ function code_snippets_manage_menu_assets( $hook ) {
 		CODE_SNIPPETS_VERSION
 	);
 }
+
+/**
+ * Handles saving the user's snippets per page preference
+ *
+ * @param  unknown $status
+ * @param  string  $option
+ * @param  unknown $value
+ * @return unknown
+ */
+function code_snippets_set_screen_option( $status, $option, $value ) {
+	if ( 'snippets_per_page' === $option ) {
+		return $value;
+	}
+
+	return $status;
+}
+
+add_filter( 'set-screen-option', 'code_snippets_set_screen_option', 10, 3 );
