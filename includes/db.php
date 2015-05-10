@@ -14,12 +14,12 @@ function set_snippet_table_vars() {
 	global $wpdb;
 
 	/* Register the snippet table names with WordPress */
-	$wpdb->tables[]           = 'snippets';
+	$wpdb->tables[] = 'snippets';
 	$wpdb->ms_global_tables[] = 'ms_snippets';
 
 	/* Setup initial table variables */
-	$wpdb->snippets           = $wpdb->prefix . 'snippets';
-	$wpdb->ms_snippets        = $wpdb->base_prefix . 'ms_snippets';
+	$wpdb->snippets = $wpdb->prefix . 'snippets';
+	$wpdb->ms_snippets = $wpdb->base_prefix . 'ms_snippets';
 }
 
 /**
@@ -44,7 +44,7 @@ function get_snippets_table_name( $multisite = null ) {
 
 	/* If multisite is not active, always return the site-wide table name */
 	if ( ! is_multisite() ) {
-		$multisire = false;
+		$multisite = false;
 	}
 
 	/* Retrieve the table name from $wpdb depending on the above conditionals */
@@ -115,12 +115,14 @@ function create_code_snippets_table( $table_name ) {
 	/* Create the database table */
 
 	$sql = "CREATE TABLE $table_name (
-				id          bigint(20) unsigned not null auto_increment primary key,
+				id          bigint(20) unsigned not null auto_increment,
 				name        tinytext not null,
 				description text,
 				code        longtext not null,
 				tags        longtext,
-				active      tinyint(1) not null default 0
+				scope       tinyint(1) default 0,
+				active      tinyint(1) not null default 0,
+				primary key (id)
 			) {$charset_collate};";
 
 	dbDelta( $sql );
