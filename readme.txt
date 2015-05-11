@@ -4,7 +4,7 @@ Donate link: http://bungeshea.com/donate/
 Tags: code-snippets, snippets, code, php, network, multisite
 Requires at least: 3.3
 Tested up to: 4.2.2
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: MIT
 License URI: license.txt
 
@@ -115,6 +115,13 @@ That's fantastic! Fork the [repository on GitHub](http://github.com/sheabunge/co
 4. Importing snippets from an XML file
 
 == Changelog ==
+
+= 2.2.2 =
+* Polyfilled array_replace_recursive() function for PHP 5.2
+* Updated references to old plugin site
+* Resolved JavaScript error on edit snippet pages
+* Made minor updates to French translation file
+* Added statuses for snippet scopes on manage snippets table
 
 = 2.2.1 =
 * Fixed the default values of new setting not being applied
@@ -325,6 +332,9 @@ __Fixed__
 
 == Upgrade Notice ==
 
+= 2.2.2 =
+Fix error with PHP 5.2 added statuses for scopes to manage snippets table
+
 = 2.2.1 =
 New snippet scope feature; fixed bug with translations not loading; minified all css and js
 
@@ -369,9 +379,6 @@ Improvements on the 'Manage Snippets' page and localization
 
 = 1.4 =
 Better code highlighting and improved multisite support
-
-= 1.3.2 =
-Code Snippets has a new website: http://code-snippets.bungeshea.com/
 
 = 1.3 =
 Added import/export feature
