@@ -6,7 +6,6 @@
  */
 
 require plugin_dir_path( __FILE__ ) . '/class-settings.php';
-Code_Snippets_Settings::setup();
 
 /**
  * Retrieve the default setting values
@@ -24,53 +23,45 @@ function code_snippets_get_settings_fields() {
 	return Code_Snippets_Settings::get_fields();
 }
 
+
 /*
  * Retrieve the setting values from the database.
  * If a setting does not exist in the database, the default value will be returned.
  * @return array
  */
 function code_snippets_get_settings() {
-	$default = Code_Snippets_Settings::get_defaults();
+
+	/* Check if the settings have been cached */
+	if ( $settings = wp_cache_get( 'code_snippets_settings' ) ) {
+		return $settings;
+	}
+
+	/* Begin with the default settings */
+	$settings = Code_Snippets_Settings::get_defaults();
+
+	/* Retrieve saved settings from the database */
 	$saved = get_option( 'code_snippets_settings', array() );
 
-	/**
-	 * Polyfull array_replace_recursive() function for PHP 5.2
-	 * @link http://php.net/manual/en/function.array-replace-recursive.php#92574
-	 */
-	if ( ! function_exists( 'array_replace_recursive' ) ) {
-		function array_replace_recursive( $array, $array1 ) {
-			function recurse( $array, $array1 ) {
-				foreach ( $array1 as $key => $value ) {
-					// create new key in $array, if it is empty or not an array
-					if ( ! isset( $array[ $key ] ) || ( isset( $array[ $key ] ) && ! is_array( $array[ $key ] ) ) ) {
-						$array[ $key ] = array();
-					}
-					// overwrite the value in the base array
-					if ( is_array( $value ) ) {
-						$value = recurse( $array[ $key ], $value );
-					}
-					$array[ $key ] = $value;
-				}
-				return $array;
-			}
+	/* Replace the default field values with the ones saved in the database */
+	if ( function_exists( 'array_replace_recursive' ) ) {
 
-			// handle the arguments, merge one by one
-			$args = func_get_args();
-			$array = $args[0];
-			if ( ! is_array( $array ) ) {
-				return $array;
-			}
-			$count = count( $args );
-			for ( $i = 1; $i < $count; ++$i ) {
-				if ( is_array( $args[ $i ] ) ) {
-					$array = recurse( $array, $args[ $i ] );
+		/* Use the much more efficient array_replace_recursive() function in PHP 5.3 and later */
+		$settings = array_replace_recursive( $settings, $saved );
+	} else {
+
+		/* Otherwise, do it manually */
+		foreach ( $settings as $section => $fields ) {
+			foreach ( $fields as $field => $value ) {
+
+				if ( isset( $saved[ $section ][ $field ] ) ) {
+					$settings[ $section ][ $field ] = $saved[ $section ][ $field ];
 				}
 			}
-			return $array;
 		}
 	}
 
-	return array_replace_recursive( $default, $saved );
+	wp_cache_set( 'code_snippets_settings', $settings );
+	return $settings;
 }
 
 /**
